@@ -1,0 +1,41 @@
+# Read-only WebDAV gateway — build from locally patched source (feat/readonly-webdav).
+#
+# The upstream image ghcr.io/ylianst/meshcentral:latest does NOT include
+# meshdav.js or the webserver.js routing patch, so you MUST build from this
+# checkout. This compose file uses `build:` instead of `image:`.
+#
+# Usage (from repo root):
+#   docker compose -f docker/readonly-dav-compose.yaml up --build
+#
+# Config persistence:
+#   config.json lives in the meshcentral-data volume at
+#     /opt/meshcentral/meshcentral-data/config.json
+#   On first start the entrypoint copies config.json.template there. To enable
+#   readOnlyDav, edit that persisted file (or mount your own via the commented
+#   bind-mount below) and restart the container. See docs/readonly-webdav.md.
+services:
+  meshcentral-readonly-dav:
+    build:
+      context: ..          # repo root, so meshdav.js + webserver.js are COPYed in
+      dockerfile: docker/readonly-dav.Dockerfile
+    environment:
+      - DYNAMIC_CONFIG=false
+      - HOSTNAME=myserver.domain.com
+      - PORT=443
+      - REDIR_PORT=80
+      - ALLOW_NEW_ACCOUNTS=false
+    volumes:
+      - meshcentral-data:/opt/meshcentral/meshcentral-data
+      - meshcentral-files:/opt/meshcentral/meshcentral-files
+      - meshcentral-web:/opt/meshcentral/meshcentral-web
+      - meshcentral-backups:/opt/meshcentral/meshcentral-backups
+      # Optionally mount a pre-edited config.json containing the readOnlyDav section:
+      # - ./my-config.json:/opt/meshcentral/meshcentral-data/config.json:ro
+    ports:
+      - 443:443
+      - 80:80
+volumes:
+  meshcentral-data:
+  meshcentral-files:
+  meshcentral-web:
+  meshcentral-backups:

@@ -136,6 +136,8 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
     obj.meshAgentHandler = require('./meshagent.js');
     obj.meshRelayHandler = require('./meshrelay.js');
     obj.meshDeviceFileHandler = require('./meshdevicefile.js');
+    obj.meshDavHandler = require('./meshdav.js');
+    obj.meshDavRoute = require('./meshdav-route.js');
     obj.meshDesktopMultiplexHandler = require('./meshdesktopmultiplex.js');
     obj.meshIderHandler = require('./amt/amt-ider.js');
     obj.meshUserHandler = require('./meshuser.js');
@@ -161,6 +163,7 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
     if (args.compression === true) {
         obj.app.use(require('compression')({ filter: function (req, res) {
             if (req.path == '/devicefile.ashx') return false; // Don't compress device file transfers to show file sizes
+            if (req.url && req.url.indexOf('/dav/') >= 0) return false; // Don't compress DAV responses
             if ((args.relaydns != null) && (obj.args.relaydns.indexOf(req.hostname) >= 0)) return false; // Don't compress DNS relay requests
             return require('compression').filter(req, res);
         }}));
@@ -172,6 +175,8 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
     obj.users = {};                             // UserID --> User
     obj.oidcLogoutUrls = {};                    // UserID --> OIDC end session URL from the last login
     obj.meshes = {};                            // MeshID --> Mesh (also called device group)
+    obj.davInstances = {};                      // domain.id --> DAV instance
+    obj.davInstanceUrls = {};                   // domain.id --> domain.url (basePath) for anti-cross-domain check
     obj.userGroups = {};                        // UGrpID --> User Group
     obj.useNodeDefaultTLSCiphers = args.usenodedefaulttlsciphers; // Use TLS ciphers provided by node
     obj.tlsCiphers = args.tlsciphers;           // List of TLS ciphers to use
@@ -7349,7 +7354,7 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
             delete req.session.tpassword;
 
             // Useful for debugging reverse proxy issues
-            parent.debug('httpheaders', req.method, req.url, req.headers);
+            parent.debug('httpheaders', req.method, obj.meshDavRoute.sanitizeUrl(req.url), obj.meshDavRoute.sanitizeHeaders(req.headers));
 
             // If this request came over HTTP, redirect to HTTPS
             if (req.headers['x-forwarded-proto'] == 'http') {
@@ -7424,7 +7429,7 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
 
             // Get the domain for this request
             const domain = req.xdomain = getDomain(req);
-            parent.debug('webrequest', '(' + req.clientIp + ') ' + req.url);
+            parent.debug('webrequest', '(' + req.clientIp + ') ' + obj.meshDavRoute.sanitizeUrl(req.url));
 
             // Skip the rest if this is an agent connection
             if ((req.url.indexOf('/meshrelay.ashx/.websocket') >= 0) || (req.url.indexOf('/agent.ashx/.websocket') >= 0) || (req.url.indexOf('/localrelay.ashx/.websocket') >= 0)) { next(); return; }
@@ -7544,7 +7549,7 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
 
                 // Get the domain for this request
                 const domain = req.xdomain = getDomain(req);
-                parent.debug('webrequest', '(' + req.clientIp + ') AgentPort: ' + req.url);
+                parent.debug('webrequest', '(' + req.clientIp + ') AgentPort: ' + obj.meshDavRoute.sanitizeUrl(req.url));
                 res.removeHeader('X-Powered-By');
                 return next();
             });
@@ -7581,6 +7586,56 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
                 parent.pluginHandler.callHook('hook_setupHttpHandlers', obj, parent);
             }
             if (parent.multiServer != null) { obj.app.ws('/meshserver.ashx', function (ws, req) { parent.multiServer.CreatePeerInServer(parent.multiServer, ws, req, obj.args.tlsoffload == null); }); }
+
+            // 只读 WebDAV：先为所有合法 enabled 且非 share 的 domain 创建实例（含 DNS 域），
+            // 再按唯一 domain.url 挂载一次 DAV 中间件与 davtunnel WS。
+            // 分发器按 getDomain(req) 动态选择实例，当前域无实例明确 404/关闭，不退到默认实例。
+            // 仅声明 localhost domainid 路由不自动开放：未配置 readonlydav.enabled 的域无实例，分发器返回 404。
+            var davMountedUrls = {};
+            for (var dj in parent.config.domains) {
+                var ddavDomain = parent.config.domains[dj];
+                if (ddavDomain.share != null) continue;
+                if ((typeof ddavDomain.readonlydav == 'object') && (ddavDomain.readonlydav.enabled === true)) {
+                    try {
+                        obj.davInstances[ddavDomain.id] = obj.meshDavHandler.CreateMeshDav(obj, parent, { domain: ddavDomain });
+                        obj.davInstanceUrls[ddavDomain.id] = ddavDomain.url;
+                    } catch (e) { parent.debug('web', 'DAV instance creation failed for domain ' + ddavDomain.id + ': ' + e); }
+                }
+            }
+            if (Object.keys(obj.davInstances).length > 0) {
+                // DAV 专用 DNS 映射：从 config.domains 独立构建，不依赖证书。
+                var davDnsDomains = {};
+                for (var ddnsI in parent.config.domains) {
+                    if (parent.config.domains[ddnsI].dns != null) { davDnsDomains[String(parent.config.domains[ddnsI].dns).toLowerCase()] = parent.config.domains[ddnsI]; }
+                }
+                // 默认 Host 来源：certificates.CommonName 或 args.cert，允许 IP/短名，排除 'un-configured'/空。
+                // 不默认允许所有 Host：无有效默认 Host 时 defaultHost=null，未知 Host 拒绝。
+                var davDefaultHost = null;
+                var davCn = null;
+                if (obj.certificates != null && typeof obj.certificates.CommonName == 'string' && obj.certificates.CommonName.length > 0 && obj.certificates.CommonName != 'un-configured') { davCn = obj.certificates.CommonName; }
+                if (davCn == null && typeof obj.args.cert == 'string' && obj.args.cert.length > 0 && obj.args.cert != 'un-configured') { davCn = obj.args.cert; }
+                if (davCn != null) { davDefaultHost = davCn.toLowerCase(); }
+                var davResolveDomain = obj.meshDavRoute.createDavDomainResolver({
+                    domains: parent.config.domains,
+                    dnsDomains: davDnsDomains,
+                    defaultHost: davDefaultHost,
+                    isLoopback: isLoopbackAddress
+                });
+                var davDispatcher = obj.meshDavRoute.createDavDispatcher({
+                    getDomain: getDomain,
+                    resolveDomain: davResolveDomain,
+                    lookup: function (domainId) { var inst = obj.davInstances[domainId]; if (inst == null) return null; return { instance: inst, url: obj.davInstanceUrls[domainId] }; }
+                });
+                for (var dk in obj.davInstanceUrls) {
+                    var durl = obj.davInstanceUrls[dk];
+                    if (davMountedUrls[durl] != null) continue;
+                    davMountedUrls[durl] = true;
+                    obj.app.use(durl + 'dav/', davDispatcher.handleRequest);
+                    obj.app.ws(durl + 'davtunnel.ashx', davDispatcher.handleAgentTunnel);
+                    if (obj.agentapp) { obj.agentapp.ws(durl + 'davtunnel.ashx', davDispatcher.handleAgentTunnel); }
+                }
+            }
+
             for (var i in parent.config.domains) {
                 if ((parent.config.domains[i].dns != null) || (parent.config.domains[i].share != null)) { continue; } // This is a subdomain with a DNS name, no added HTTP bindings needed.
                 var domain = parent.config.domains[i];
@@ -8416,7 +8471,7 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
             // Handle 404 error
             if (obj.args.nice404 !== false) {
                 obj.app.use(function (req, res, next) {
-                    parent.debug('web', '404 Error ' + req.url);
+                    parent.debug('web', '404 Error ' + obj.meshDavRoute.sanitizeUrl(req.url));
                     var domain = getDomain(req);
                     if ((domain == null) || (domain.auth == 'sspi')) { res.sendStatus(404); return; }
                     if ((domain.loginkey != null) && (domain.loginkey.indexOf(req.query.key) == -1)) { res.sendStatus(404); return; } // Check 3FA URL
@@ -8438,7 +8493,7 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
     }
 
     function nice404(req, res) {
-        parent.debug('web', '404 Error ' + req.url);
+        parent.debug('web', '404 Error ' + obj.meshDavRoute.sanitizeUrl(req.url));
         var domain = getDomain(req);
         if ((domain == null) || (domain.auth == 'sspi')) { res.sendStatus(404); return; }
         if ((domain.loginkey != null) && (domain.loginkey.indexOf(req.query.key) == -1)) { res.sendStatus(404); return; } // Check 3FA URL

@@ -2614,6 +2614,58 @@
               }
             }
           },
+          "readOnlyDav": {
+            "type": "object",
+            "description": "Read-only WebDAV gateway that exposes Agent file systems over standard WebDAV (OPTIONS, PROPFIND, GET, HEAD). All write methods return 405. See docs/readonly-webdav.md.",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false,
+                "description": "Enable the read-only WebDAV gateway for this domain. The gateway reuses the existing HTTPS port, no extra port is needed."
+              },
+              "realm": {
+                "type": "string",
+                "default": "MeshCentral Read-Only DAV",
+                "description": "HTTP 401 Basic authentication realm string."
+              },
+              "shares": {
+                "type": "object",
+                "description": "Share name (key) is automatically lowercased by MeshCentral. Each share has independent Basic authentication and points to a single Agent node + remote root path.",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "description": "WebDAV client username for this share. Required."
+                    },
+                    "passwordHash": {
+                      "type": "string",
+                      "description": "scrypt password hash in the form 'scrypt:<salthex>:<hashhex>' (16-byte salt, 32-byte hash). See docs/readonly-webdav.md for interactive stdin-based hash generation. Required."
+                    },
+                    "runAsUser": {
+                      "type": "string",
+                      "description": "MeshCentral user ID (e.g. 'user//davreader') used to perform file operations. Must be a dedicated low-privilege account with file rights (bit 8) on the target node. Do not use an admin account. Required."
+                    },
+                    "nodeId": {
+                      "type": "string",
+                      "description": "Target Agent node ID. Must start with 'node/<domain.id>/'. The Agent must be online on this server (wsagents); multi-server routing is not supported in the first version. Required."
+                    },
+                    "root": {
+                      "type": "string",
+                      "description": "Absolute remote root path on the Agent. Use forward slashes even on Windows (e.g. 'C:/Data'). No symlink/junction physical isolation is provided; root must not contain links pointing outside the permitted scope. Required."
+                    },
+                    "maxDownloads": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "default": 4,
+                      "description": "Maximum concurrent downloads for this share. Excess requests return 503 with Retry-After."
+                    }
+                  },
+                  "required": ["username", "passwordHash", "runAsUser", "nodeId", "root"]
+                }
+              }
+            }
+          },
           "urlSwitching": {
             "type": "boolean",
             "default": true,

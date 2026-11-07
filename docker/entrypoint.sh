@@ -415,7 +415,7 @@ if [[ ${INSTALL_STYLISHUI,,} =~ ^(true|yes)$ ]]; then
 fi
 
 # Actually start MeshCentral.
-node /opt/meshcentral/meshcentral/meshcentral --configfile "${CONFIG_FILE}" "${ARGS}" &
+node /opt/meshcentral/meshcentral/meshcentral --configfile "${CONFIG_FILE}" "${ARGS}" >> /proc/1/fd/1 &
 meshcentral_pid=$!
 
 wait "$meshcentral_pid"
