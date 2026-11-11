@@ -6045,6 +6045,7 @@ module.exports.CreateMeshUser = function (parent, db, ws, req, args, domain, use
         'updateUserImage': serverCommandUpdateUserImage,
         'urlargs': serverCommandUrlArgs,
         'users': serverCommandUsers,
+        'webdav': serverCommandWebDav,
         'verifyemail': serverCommandVerifyEmail,
         'verifyPhone': serverCommandVerifyPhone,
         'verifyMessaging': serverCommandVerifyMessaging
@@ -6110,6 +6111,12 @@ module.exports.CreateMeshUser = function (parent, db, ws, req, args, domain, use
         'webpush': [serverUserCommandWebPush, ""],
         'webstats': [serverUserCommandWebStats, ""]
     };
+
+    // WebDAV account management from the web panel (webdav/webdav.js)
+    function serverCommandWebDav(command) {
+        if (parent.parent.webdavHandler == null) { obj.send({ action: 'webdav', sub: command.sub, responseid: command.responseid, error: 'disabled' }); return; }
+        parent.parent.webdavHandler.handleUserCommand(obj, parent.users[obj.user._id] || obj.user, domain, command);
+    }
 
     function getDelegatedMeshRights(rights, requested, existing) {
         if (rights == MESHRIGHT_ADMIN) return requested;

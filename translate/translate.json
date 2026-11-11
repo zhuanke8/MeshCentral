@@ -3378,6 +3378,14 @@
       ]
     },
     {
+      "en": "3 to 64 letters, digits, . _ @ -",
+      "zh-chs": "3 到 64 个字符：字母、数字、. _ @ -",
+      "zh-cht": "3 到 64 個字元：字母、數字、. _ @ -",
+      "xloc": [
+        "default3.handlebars->123->3704"
+      ]
+    },
+    {
       "bs": "3. Svi reklamni materijali koji pominju karakteristike ili upotrebu ovog softvera moraju imati sljedeću potvrdu: \"Ovaj proizvod uključuje softver koji je razvio OpenSSL Project za korištenje u OpenSSL Toolkit-u. (http://www.openssl.org/)\"",
       "ca": "3. Tots els materials publicitaris que mencionin característiques o ús d'aquest programari han de mostrar el següent reconeixement: \"Aquest producte inclou programari desenvolupat pel projecte OpenSSL per utilitzar-lo a l'OpenSSL Toolkit. (http://www.openssl.org/)\"",
       "cs": "3. Všechny reklamní materiály zmiňující funkce nebo použití tohoto softwaru musí obsahovat následující oznámení: „Tento produkt zahrnuje software vyvinutý projektem OpenSSL pro použití v sadě OpenSSL Toolkit. (http://www.openssl.org/)“",
@@ -4977,6 +4985,17 @@
       ]
     },
     {
+      "en": "Access",
+      "zh-chs": "访问权限",
+      "zh-cht": "存取權限",
+      "xloc": [
+        "default.handlebars->121->3685",
+        "default.handlebars->121->3713",
+        "default3.handlebars->123->3682",
+        "default3.handlebars->123->3709"
+      ]
+    },
+    {
       "bs": "Pristup odbijen",
       "ca": "Accés denegat",
       "cs": "Přístup odepřen",
@@ -5793,6 +5812,33 @@
       "xloc": [
         "default.handlebars->container->column_l->p2->p2info->p2AccountSecurity->1->0",
         "default3.handlebars->container->column_l->p2->p2info->p2AccountSecurity->1->0"
+      ]
+    },
+    {
+      "en": "Account {0} created.",
+      "zh-chs": "已创建账户 {0}。",
+      "zh-cht": "已建立帳戶 {0}。",
+      "xloc": [
+        "default.handlebars->121->3664",
+        "default3.handlebars->123->3661"
+      ]
+    },
+    {
+      "en": "Account {0} deleted.",
+      "zh-chs": "已删除账户 {0}。",
+      "zh-cht": "已刪除帳戶 {0}。",
+      "xloc": [
+        "default.handlebars->121->3666",
+        "default3.handlebars->123->3663"
+      ]
+    },
+    {
+      "en": "Account {0} updated.",
+      "zh-chs": "已更新账户 {0}。",
+      "zh-cht": "已更新帳戶 {0}。",
+      "xloc": [
+        "default.handlebars->121->3665",
+        "default3.handlebars->123->3662"
       ]
     },
     {
@@ -8928,6 +8974,24 @@
       "zh-cht": "所有主題",
       "xloc": [
         "default3.handlebars->123->2307"
+      ]
+    },
+    {
+      "en": "All devices I can manage files on, including devices added later",
+      "zh-chs": "我有文件管理权限的所有设备（包括以后新增的设备）",
+      "zh-cht": "我有檔案管理權限的所有裝置（包括以後新增的裝置）",
+      "xloc": [
+        "default.handlebars->121->3717",
+        "default3.handlebars->123->3713"
+      ]
+    },
+    {
+      "en": "All devices with file access",
+      "zh-chs": "所有有文件权限的设备",
+      "zh-cht": "所有有檔案權限的裝置",
+      "xloc": [
+        "default.handlebars->121->3689",
+        "default3.handlebars->123->3686"
       ]
     },
     {
@@ -14696,6 +14760,15 @@
       ]
     },
     {
+      "en": "Changed WebDAV account {0}",
+      "zh-chs": "修改了 WebDAV 账户 {0}",
+      "zh-cht": "修改了 WebDAV 帳戶 {0}",
+      "xloc": [
+        "default.handlebars->121->2907",
+        "default3.handlebars->123->2912"
+      ]
+    },
+    {
       "bs": "Promijenjene akreditive računa",
       "ca": "S'han canviat les credencials del compte",
       "cs": "Změněná pověření účtu",
@@ -18980,6 +19053,17 @@
       ]
     },
     {
+      "en": "Copied to clipboard",
+      "zh-chs": "已复制到剪贴板",
+      "zh-cht": "已複製到剪貼簿",
+      "xloc": [
+        "default.handlebars->121->3662",
+        "default3.handlebars->123->3658",
+        "default3.handlebars->123->3659",
+        "default3.handlebars->123->3660"
+      ]
+    },
+    {
       "bs": "Kopiraj",
       "ca": "Còpia",
       "cs": "Kopírovat",
@@ -19934,6 +20018,15 @@
       ]
     },
     {
+      "en": "Create an account",
+      "zh-chs": "创建账户",
+      "zh-cht": "建立帳戶",
+      "xloc": [
+        "default.handlebars->121->3681",
+        "default3.handlebars->123->3678"
+      ]
+    },
+    {
       "bs": "Kreiraj fajl: \\\"{0}\\\"",
       "ca": "Crea fitxer: \\\"{0}\\\"",
       "cs": "Vytvořit soubor: \\\"{0}\\\"",
@@ -20111,6 +20204,15 @@
         "login-mobile.handlebars->container->page_content->column_l->1->1->0->1->loginpanel->1->newAccountDiv->1",
         "login.handlebars->container->column_l->centralTable->1->0->logincell->loginpanel->1->loginuserpassdiv->newAccountDiv->1",
         "login2.handlebars->centralTable->1->0->logincell->loginpanel->loginpanelform->loginuserpassdiv->newAccountDiv->1"
+      ]
+    },
+    {
+      "en": "Created WebDAV account {0}",
+      "zh-chs": "创建了 WebDAV 账户 {0}",
+      "zh-cht": "建立了 WebDAV 帳戶 {0}",
+      "xloc": [
+        "default.handlebars->121->2906",
+        "default3.handlebars->123->2911"
       ]
     },
     {
@@ -21919,6 +22021,24 @@
       ]
     },
     {
+      "en": "Delete WebDAV Account",
+      "zh-chs": "删除 WebDAV 账户",
+      "zh-cht": "刪除 WebDAV 帳戶",
+      "xloc": [
+        "default.handlebars->121->3702",
+        "default3.handlebars->123->3699"
+      ]
+    },
+    {
+      "en": "Delete WebDAV account {0}? Clients using it will lose access.",
+      "zh-chs": "删除 WebDAV 账户 {0}？使用该账户的客户端将无法再访问。",
+      "zh-cht": "刪除 WebDAV 帳戶 {0}？使用該帳戶的用戶端將無法再存取。",
+      "xloc": [
+        "default.handlebars->121->3703",
+        "default3.handlebars->123->3700"
+      ]
+    },
+    {
       "bs": "Obriši račun",
       "ca": "Esborrar compte",
       "cs": "Smazat účet",
@@ -22332,6 +22452,15 @@
       "xloc": [
         "default.handlebars->121->2788",
         "default3.handlebars->123->2793"
+      ]
+    },
+    {
+      "en": "Deleted WebDAV account {0}",
+      "zh-chs": "删除了 WebDAV 账户 {0}",
+      "zh-cht": "刪除了 WebDAV 帳戶 {0}",
+      "xloc": [
+        "default.handlebars->121->2908",
+        "default3.handlebars->123->2913"
       ]
     },
     {
@@ -25290,6 +25419,15 @@
       ]
     },
     {
+      "en": "Disable",
+      "zh-chs": "禁用",
+      "zh-cht": "停用",
+      "xloc": [
+        "default.handlebars->121->3698",
+        "default3.handlebars->123->3695"
+      ]
+    },
+    {
       "bs": "Onemogućite postavke kursora",
       "ca": "Desactiva la configuració del cursor",
       "cs": "Zakázat nastavení kurzoru",
@@ -27930,6 +28068,15 @@
       ]
     },
     {
+      "en": "Each device you can manage files on shows up as a folder. Devices only need the normal MeshAgent connection: no port is opened on the device.",
+      "zh-chs": "每台你有文件管理权限的设备都显示为一个文件夹。设备只需保持正常的 MeshAgent 连接，无需在设备上开放任何端口。",
+      "zh-cht": "每台你有檔案管理權限的裝置都顯示為一個資料夾。裝置只需保持正常的 MeshAgent 連線，無需在裝置上開放任何連接埠。",
+      "xloc": [
+        "default.handlebars->container->column_l->p7->p7info->1->1->3",
+        "default3.handlebars->container->column_l->p7->p7info->3->1->1->3"
+      ]
+    },
+    {
       "bs": "Uredi",
       "ca": "Edita",
       "cs": "Upravit",
@@ -28651,6 +28798,15 @@
       ]
     },
     {
+      "en": "Edit WebDAV Account",
+      "zh-chs": "编辑 WebDAV 账户",
+      "zh-cht": "編輯 WebDAV 帳戶",
+      "xloc": [
+        "default.handlebars->121->3721",
+        "default3.handlebars->123->3716"
+      ]
+    },
+    {
       "bs": "Uredite postavke udaljene radne površine",
       "ca": "Editeu la configuració de l'escriptori remot",
       "cs": "Upravit nastavení vzdálené plochy",
@@ -29345,6 +29501,15 @@
         "login.handlebars->container->column_l->centralTable->1->0->logincell->createpanel->1->9->1->2->nuEmail",
         "login.handlebars->container->column_l->centralTable->1->0->logincell->resetpanel->1->7->1->0->1",
         "login2.handlebars->centralTable->1->0->logincell->createpanel->createpanelform->9->1->2->nuEmail"
+      ]
+    },
+    {
+      "en": "Enable",
+      "zh-chs": "启用",
+      "zh-cht": "啟用",
+      "xloc": [
+        "default.handlebars->121->3699",
+        "default3.handlebars->123->3696"
       ]
     },
     {
@@ -34676,6 +34841,15 @@
       "xloc": [
         "default.handlebars->121->862",
         "default3.handlebars->123->860"
+      ]
+    },
+    {
+      "en": "Generate",
+      "zh-chs": "生成",
+      "zh-cht": "產生",
+      "xloc": [
+        "default.handlebars->121->3711",
+        "default3.handlebars->123->3707"
       ]
     },
     {
@@ -42172,6 +42346,15 @@
       ]
     },
     {
+      "en": "Invalid root folder.",
+      "zh-chs": "根目录无效。",
+      "zh-cht": "根目錄無效。",
+      "xloc": [
+        "default.handlebars->121->3675",
+        "default3.handlebars->123->3672"
+      ]
+    },
+    {
       "bs": "Nevažeća sigurnosna provjera.",
       "ca": "Comprovació de seguretat no vàlida.",
       "de": "Ungültiger Sicherheitscheck",
@@ -44718,6 +44901,15 @@
         "default.handlebars->121->135",
         "default3.handlebars->123->1085",
         "default3.handlebars->123->133"
+      ]
+    },
+    {
+      "en": "Last used",
+      "zh-chs": "最后使用",
+      "zh-cht": "最後使用",
+      "xloc": [
+        "default.handlebars->121->3688",
+        "default3.handlebars->123->3685"
       ]
     },
     {
@@ -53647,6 +53839,15 @@
       ]
     },
     {
+      "en": "New WebDAV Account",
+      "zh-chs": "新建 WebDAV 账户",
+      "zh-cht": "新增 WebDAV 帳戶",
+      "xloc": [
+        "default.handlebars->121->3722",
+        "default3.handlebars->123->3717"
+      ]
+    },
+    {
       "bs": "Nova šifra*",
       "ca": "Nova contrasenya*",
       "cs": "Nové heslo*",
@@ -53676,6 +53877,15 @@
         "default.handlebars->121->2498",
         "default3.handlebars->123->2506",
         "default3.handlebars->123->2507"
+      ]
+    },
+    {
+      "en": "New password, leave empty to keep the current one",
+      "zh-chs": "新密码（留空则保持不变）",
+      "zh-cht": "新密碼（留空則保持不變）",
+      "xloc": [
+        "default.handlebars->121->3709",
+        "default3.handlebars->123->3705"
       ]
     },
     {
@@ -54850,6 +55060,15 @@
       ]
     },
     {
+      "en": "No WebDAV accounts yet.",
+      "zh-chs": "还没有 WebDAV 账户。",
+      "zh-cht": "尚無 WebDAV 帳戶。",
+      "xloc": [
+        "default.handlebars->121->3680",
+        "default3.handlebars->123->3677"
+      ]
+    },
+    {
       "bs": "Trenutno nema dostupnih radnji za ovaj uređaj.",
       "ca": "Actualment no hi ha cap acció disponible per a aquest dispositiu.",
       "cs": "Momentálně nejsou pro toto zařízení k dispozici žádné akce.",
@@ -55068,6 +55287,14 @@
         "default.handlebars->container->column_l->p2->p2info->p2noMeshFound",
         "default3.handlebars->container->column_l->p1->NoMeshesPanel->1->1->0->3->getStarted2",
         "default3.handlebars->container->column_l->p2->p2info->p2noMeshFound"
+      ]
+    },
+    {
+      "en": "No device with file access rights.",
+      "zh-chs": "没有具有文件权限的设备。",
+      "zh-cht": "沒有具有檔案權限的裝置。",
+      "xloc": [
+        "default.handlebars->121->3707"
       ]
     },
     {
@@ -55343,6 +55570,15 @@
       "xloc": [
         "default.handlebars->121->418",
         "default3.handlebars->123->416"
+      ]
+    },
+    {
+      "en": "No file access rights on a selected device.",
+      "zh-chs": "对所选的某台设备没有文件权限。",
+      "zh-cht": "對所選的某台裝置沒有檔案權限。",
+      "xloc": [
+        "default.handlebars->121->3674",
+        "default3.handlebars->123->3671"
       ]
     },
     {
@@ -55648,6 +55884,15 @@
       "xloc": [
         "default.handlebars->121->2893",
         "default3.handlebars->123->2898"
+      ]
+    },
+    {
+      "en": "No matching accounts.",
+      "zh-chs": "没有匹配的账户。",
+      "zh-cht": "沒有符合的帳戶。",
+      "xloc": [
+        "default.handlebars->121->3701",
+        "default3.handlebars->123->3698"
       ]
     },
     {
@@ -57818,6 +58063,15 @@
       ]
     },
     {
+      "en": "Only this folder of each device is shared. Leave empty to share the whole file system.",
+      "zh-chs": "只共享每台设备上的这个文件夹。留空则共享整个文件系统。",
+      "zh-cht": "只共用每台裝置上的這個資料夾。留空則共用整個檔案系統。",
+      "xloc": [
+        "default.handlebars->121->3720",
+        "default3.handlebars->123->3715"
+      ]
+    },
+    {
       "ca": "Obert",
       "de": "Öffnen",
       "en": "Open",
@@ -58513,6 +58767,15 @@
         "default-mobile.handlebars->55->897",
         "default.handlebars->121->1805",
         "default3.handlebars->123->1802"
+      ]
+    },
+    {
+      "en": "Owner",
+      "zh-chs": "所有者",
+      "zh-cht": "擁有者",
+      "xloc": [
+        "default.handlebars->121->3683",
+        "default3.handlebars->123->3680"
       ]
     },
     {
@@ -59224,6 +59487,17 @@
       ]
     },
     {
+      "en": "Password must be at least 8 characters.",
+      "zh-chs": "密码至少需要 8 个字符。",
+      "zh-cht": "密碼至少需要 8 個字元。",
+      "xloc": [
+        "default.handlebars->121->3669",
+        "default.handlebars->121->3724",
+        "default3.handlebars->123->3666",
+        "default3.handlebars->123->3720"
+      ]
+    },
+    {
       "bs": "Lozinka odbijena, koristite drugu.",
       "ca": "Contrasenya rebutjada, utilitzeu-ne una de diferent.",
       "cs": "Heslo odmítnuto, zkuste jiné.",
@@ -59252,6 +59526,15 @@
         "login-mobile.handlebars->23->10",
         "login.handlebars->13->12",
         "login2.handlebars->17->210"
+      ]
+    },
+    {
+      "en": "Password, at least 8 characters",
+      "zh-chs": "密码（至少 8 个字符）",
+      "zh-cht": "密碼（至少 8 個字元）",
+      "xloc": [
+        "default.handlebars->121->3710",
+        "default3.handlebars->123->3706"
       ]
     },
     {
@@ -63081,6 +63364,28 @@
       ]
     },
     {
+      "en": "Read and write",
+      "zh-chs": "读写",
+      "zh-cht": "讀寫",
+      "xloc": [
+        "default.handlebars->121->3693",
+        "default.handlebars->121->3714",
+        "default3.handlebars->123->3690",
+        "default3.handlebars->123->3710"
+      ]
+    },
+    {
+      "en": "Read only",
+      "zh-chs": "只读",
+      "zh-cht": "唯讀",
+      "xloc": [
+        "default.handlebars->121->3692",
+        "default.handlebars->121->3715",
+        "default3.handlebars->123->3689",
+        "default3.handlebars->123->3711"
+      ]
+    },
+    {
       "en": "Read-only mode is active. Use the Registry list to browse this hive.",
       "ar": "وضع القراءة نشط. استخدم قائمة التسجيل لتصفح هذه الخلية.",
       "bs": "Način samo za čitanje je aktivan. Koristite listu registra za pregledavanje ovog hive-a.",
@@ -66786,6 +67091,15 @@
       ]
     },
     {
+      "en": "Removed device",
+      "zh-chs": "已移除的设备",
+      "zh-cht": "已移除的裝置",
+      "xloc": [
+        "default.handlebars->121->3690",
+        "default3.handlebars->123->3687"
+      ]
+    },
+    {
       "bs": "Uklonjeno dijeljenje uređaja {0}",
       "ca": "S'ha eliminat el dispositiu compartit {0}",
       "cs": "Odebráno sdílení zařízení {0}",
@@ -68407,6 +68721,24 @@
         "default.handlebars->termShellContextMenuLinux->1->0",
         "default3.handlebars->container->column_l->p12->termTable->1->1->0->1->1->connectbutton2span->5->21->0->0",
         "xterm.handlebars->termShellContextMenuLinux->cxtermnorm->0"
+      ]
+    },
+    {
+      "en": "Root folder",
+      "zh-chs": "根目录",
+      "zh-cht": "根目錄",
+      "xloc": [
+        "default.handlebars->121->3686",
+        "default3.handlebars->123->3683"
+      ]
+    },
+    {
+      "en": "Root folder (optional)",
+      "zh-chs": "根目录（可选）",
+      "zh-cht": "根目錄（選填）",
+      "xloc": [
+        "default.handlebars->121->3719",
+        "default3.handlebars->123->3714"
       ]
     },
     {
@@ -71379,6 +71711,25 @@
         "default-mobile.handlebars->55->571",
         "default.handlebars->121->1270",
         "default3.handlebars->123->1285"
+      ]
+    },
+    {
+      "en": "Select at least one device.",
+      "zh-chs": "请至少选择一台设备。",
+      "zh-cht": "請至少選擇一台裝置。",
+      "xloc": [
+        "default.handlebars->121->3672",
+        "default.handlebars->121->3725",
+        "default3.handlebars->123->3669",
+        "default3.handlebars->123->3721"
+      ]
+    },
+    {
+      "en": "Select devices",
+      "zh-chs": "选择设备",
+      "zh-cht": "選擇裝置",
+      "xloc": [
+        "default3.handlebars->123->3718"
       ]
     },
     {
@@ -80506,6 +80857,15 @@
       ]
     },
     {
+      "en": "The owner of this account no longer exists.",
+      "zh-chs": "此账户的所有者已不存在。",
+      "zh-cht": "此帳戶的擁有者已不存在。",
+      "xloc": [
+        "default.handlebars->121->3678",
+        "default3.handlebars->123->3675"
+      ]
+    },
+    {
       "bs": "Trenutno nema obavještenja",
       "ca": "Actualment no hi ha notificacions",
       "cs": "V tuto chvíli zde nejsou žádná upozornění",
@@ -80658,6 +81018,15 @@
       "xloc": [
         "default.handlebars->121->123",
         "default3.handlebars->123->121"
+      ]
+    },
+    {
+      "en": "This WebDAV username is already used.",
+      "zh-chs": "该 WebDAV 用户名已被使用。",
+      "zh-cht": "該 WebDAV 使用者名稱已被使用。",
+      "xloc": [
+        "default.handlebars->121->3670",
+        "default3.handlebars->123->3667"
       ]
     },
     {
@@ -82587,6 +82956,24 @@
       "xloc": [
         "default.handlebars->121->348",
         "default3.handlebars->123->345"
+      ]
+    },
+    {
+      "en": "Too many WebDAV accounts.",
+      "zh-chs": "WebDAV 账户数量已达上限。",
+      "zh-cht": "WebDAV 帳戶數量已達上限。",
+      "xloc": [
+        "default.handlebars->121->3671",
+        "default3.handlebars->123->3668"
+      ]
+    },
+    {
+      "en": "Too many devices.",
+      "zh-chs": "设备数量过多。",
+      "zh-cht": "裝置數量過多。",
+      "xloc": [
+        "default.handlebars->121->3673",
+        "default3.handlebars->123->3670"
       ]
     },
     {
@@ -87638,6 +88025,17 @@
       ]
     },
     {
+      "en": "Username must be 3 to 64 characters: letters, digits, dot, underscore, @ or dash.",
+      "zh-chs": "用户名须为 3 到 64 个字符，只能包含字母、数字、点、下划线、@ 或短横线。",
+      "zh-cht": "使用者名稱須為 3 到 64 個字元，只能包含字母、數字、點、底線、@ 或連字號。",
+      "xloc": [
+        "default.handlebars->121->3668",
+        "default.handlebars->121->3723",
+        "default3.handlebars->123->3665",
+        "default3.handlebars->123->3719"
+      ]
+    },
+    {
       "bs": "Korisničko ime:",
       "ca": "Nom d'usuari:",
       "cs": "Uživatelské jméno:",
@@ -89616,6 +90014,24 @@
       ]
     },
     {
+      "en": "WebDAV address",
+      "zh-chs": "WebDAV 地址",
+      "zh-cht": "WebDAV 位址",
+      "xloc": [
+        "default.handlebars->container->column_l->p7->p7info->1->1->1->0",
+        "default3.handlebars->container->column_l->p7->p7info->3->1->1->1->1"
+      ]
+    },
+    {
+      "en": "WebDAV is disabled on this server.",
+      "zh-chs": "此服务器已禁用 WebDAV。",
+      "zh-cht": "此伺服器已停用 WebDAV。",
+      "xloc": [
+        "default.handlebars->121->3667",
+        "default3.handlebars->123->3664"
+      ]
+    },
+    {
       "bs": "WebRDP",
       "ca": "WebRDP",
       "cs": "WebRDP",
@@ -89993,6 +90409,15 @@
       "xloc": [
         "default.handlebars->121->2514",
         "default3.handlebars->123->2523"
+      ]
+    },
+    {
+      "en": "Whole file system",
+      "zh-chs": "整个文件系统",
+      "zh-cht": "整個檔案系統",
+      "xloc": [
+        "default.handlebars->121->3694",
+        "default3.handlebars->123->3691"
       ]
     },
     {
@@ -92589,6 +93014,15 @@
       ]
     },
     {
+      "en": "alist: add a \"WebDAV\" storage with this address and one of the accounts below. Windows: map a network drive to this address (HTTPS required).",
+      "zh-chs": "alist：添加一个“WebDAV”存储，填写此地址和下面任一账户。Windows：将此地址映射为网络驱动器（需要 HTTPS）。",
+      "zh-cht": "alist：新增一個「WebDAV」儲存，填寫此位址和下方任一帳戶。Windows：將此位址對應為網路磁碟機（需要 HTTPS）。",
+      "xloc": [
+        "default.handlebars->container->column_l->p7->p7info->1->1->5",
+        "default3.handlebars->container->column_l->p7->p7info->3->1->1->5"
+      ]
+    },
+    {
       "en": "allow override",
       "bs": "dozvoli nadjačavanje",
       "ca": "permet substituir",
@@ -93571,6 +94005,15 @@
       ]
     },
     {
+      "en": "no file access",
+      "zh-chs": "无文件权限",
+      "zh-cht": "無檔案權限",
+      "xloc": [
+        "default.handlebars->121->3706",
+        "default3.handlebars->123->3702"
+      ]
+    },
+    {
       "ca": "ntfy",
       "en": "ntfy",
       "es": "ntfy",
@@ -93584,6 +94027,15 @@
         "default.handlebars->121->3245",
         "default3.handlebars->123->1985",
         "default3.handlebars->123->3244"
+      ]
+    },
+    {
+      "en": "offline",
+      "zh-chs": "离线",
+      "zh-cht": "離線",
+      "xloc": [
+        "default.handlebars->121->3705",
+        "default3.handlebars->123->3701"
       ]
     },
     {

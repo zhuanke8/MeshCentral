@@ -5036,7 +5036,7 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
         form.parse(req, function (err, fields, files) {
             if (err) { res.status(400).json({ success: false, error: (err.status === 413) ? 'Icon files must be non-empty and ' + (customIconMaxFileSize / 1048576) + ' MB or smaller.' : 'Invalid form submission.' }); return; }
 
-            const allowedTypes = { myDevices: 1, myAccount: 1, myEvents: 1, myFiles: 1, myUsers: 1, myServer: 1 };
+            const allowedTypes = { myDevices: 1, myAccount: 1, myEvents: 1, myFiles: 1, myUsers: 1, myServer: 1, myWebDAV: 1 };
             const iconType = (fields && fields.iconType && fields.iconType[0]) ? fields.iconType[0] : null;
             if ((typeof iconType !== 'string') || (allowedTypes[iconType] !== 1)) { res.status(400).json({ success: false, error: 'Invalid icon type.' }); return; }
 
@@ -7719,6 +7719,16 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
                     obj.app.get(url + 'newAccountCaptcha.ashx', handleNewAccountCaptchaRequest);
                 }
 
+                // WebDAV gateway to device files (webdav/webdav.js). Accounts are managed from the panel, agents connect back on webdavrelay.ashx
+                if (parent.webdavHandler != null) {
+                    obj.app.use(url + 'webdav', function (req, res) {
+                        const domain = checkUserIpAddress(req, res);
+                        if (domain == null) { return; }
+                        parent.webdavHandler.handleWebDavRequest(req, res, domain);
+                    });
+                    obj.app.ws(url + 'webdavrelay.ashx', function (ws, req) { parent.webdavHandler.handleRelayWebSocket(ws, req); });
+                }
+
                 // Check CrowdSec Bounser if configured
                 if (parent.crowdSecBounser != null) {
                     obj.app.get(url + 'captcha.ashx', handleCaptchaGetRequest);
@@ -8174,6 +8184,9 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
 
                     // Allows agents to transfer files
                     obj.agentapp.ws(url + 'devicefile.ashx', function (ws, req) { obj.meshDeviceFileHandler.CreateMeshDeviceFile(obj, ws, null, req, domain); });
+
+                    // Allows agents to open WebDAV file tunnels
+                    if (parent.webdavHandler != null) { obj.agentapp.ws(url + 'webdavrelay.ashx', function (ws, req) { parent.webdavHandler.handleRelayWebSocket(ws, req); }); }
 
                     // Setup agent to/from server file transfer handler
                     obj.agentapp.ws(url + 'agenttransfer.ashx', handleAgentFileTransfer); // Setup agent to/from server file transfer handler

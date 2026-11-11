@@ -1794,6 +1794,11 @@ function CreateMeshCentralServer(config, args) {
                 obj.pluginHandler = require('./pluginHandler.js').pluginHandler(obj);
             }
 
+            // Load the WebDAV gateway, disable with "settings": { "webdav": false }
+            if (obj.config.settings.webdav !== false) {
+                try { obj.webdavHandler = require('./webdav/webdav.js').CreateWebDav(obj); } catch (ex) { console.log('WebDAV module failed to load: ' + ex); }
+            }
+
             // Load the default meshcore and meshcmd
             obj.updateMeshCore();
             obj.updateMeshCmd();

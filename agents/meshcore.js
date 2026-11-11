@@ -2436,6 +2436,19 @@ function getSystemInformation(func) {
     } catch (ex) { func(null, ex); }
 }
 
+// On Linux, macOS and BSD, fs.statSync() formats file times with localtime() but adds a "Z" (UTC) suffix.
+// Rebuild the time as local time so it becomes a real UTC time. Windows already uses UTC.
+function fixFileTime(t) {
+    if ((process.platform == 'win32') || (typeof t != 'string')) return t;
+    var m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/.exec(t);
+    if (m == null) return t;
+    try {
+        var d = new Date(parseInt(m[1], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10), parseInt(m[4], 10), parseInt(m[5], 10), parseInt(m[6], 10));
+        if (isNaN(d.getTime())) return t;
+        return d.toISOString();
+    } catch (ex) { return t; }
+}
+
 // Get a formatted response for a given directory path
 function getDirectoryInfo(reqpath) {
     var response = { path: reqpath, dir: [] };
@@ -2464,9 +2477,9 @@ function getDirectoryInfo(reqpath) {
                     try { stat = fs.statSync(p); } catch (ex) { } // TODO: Get file size/date
                     if ((stat != null) && (stat != undefined)) {
                         if (stat.isDirectory() == true) {
-                            response.dir.push({ n: results[i], t: 2, d: stat.mtime });
+                            response.dir.push({ n: results[i], t: 2, d: fixFileTime(stat.mtime) });
                         } else {
-                            response.dir.push({ n: results[i], t: 3, s: stat.size, d: stat.mtime });
+                            response.dir.push({ n: results[i], t: 3, s: stat.size, d: fixFileTime(stat.mtime) });
                         }
                     }
                 }
@@ -4220,20 +4233,26 @@ function onTunnelData(data)
                                 }
                             }
                             MeshServerLogEx((cmd.ask == 'coredump') ? 104 : 49, [cmd.path], 'Download: \"' + cmd.path + '\"', this.httprequest);
-                            if ((cmd.path == null) || (this.filedownload != null)) { this.write({ action: 'download', sub: 'cancel', id: this.filedownload.id }); delete this.filedownload; }
+                            if (this.filedownload != null) { this.write({ action: 'download', sub: 'cancel', id: this.filedownload.id }); try { fs.closeSync(this.filedownload.f); } catch (ex) { } delete this.filedownload; }
+                            if (cmd.path == null) { this.write({ action: 'download', sub: 'cancel', id: cmd.id }); break; }
                             this.filedownload = { id: cmd.id, path: cmd.path, ptr: 0 }
+                            // Optional partial download: start at "offset" and stop after "length" bytes (used by WebDAV range requests)
+                            if ((typeof cmd.offset == 'number') && (cmd.offset > 0)) { this.filedownload.partial = true; this.filedownload.ptr = Math.floor(cmd.offset); }
+                            if ((typeof cmd.length == 'number') && (cmd.length > 0)) { this.filedownload.partial = true; this.filedownload.remaining = Math.floor(cmd.length); }
                             try { this.filedownload.f = fs.openSync(this.filedownload.path, 'rbN'); } catch (ex) { this.write({ action: 'download', sub: 'cancel', id: this.filedownload.id }); delete this.filedownload; }
-                            if (this.filedownload) { this.write({ action: 'download', sub: 'start', id: cmd.id }); }
+                            if (this.filedownload) { this.write({ action: 'download', sub: 'start', id: cmd.id, offset: this.filedownload.ptr, partial: 1 }); }
                         } else if ((this.filedownload != null) && (cmd.id == this.filedownload.id)) { // Download commands
-                            if (cmd.sub == 'startack') { sendNextBlock = ((typeof cmd.ack == 'number') ? cmd.ack : 8); } else if (cmd.sub == 'stop') { delete this.filedownload; } else if (cmd.sub == 'ack') { sendNextBlock = 1; }
+                            if (cmd.sub == 'startack') { sendNextBlock = ((typeof cmd.ack == 'number') ? cmd.ack : 8); } else if (cmd.sub == 'stop') { try { fs.closeSync(this.filedownload.f); } catch (ex) { } delete this.filedownload; } else if (cmd.sub == 'ack') { sendNextBlock = 1; }
                         }
                         // Send the next download block(s)
                         if (sendNextBlock > 0) {
                             sendNextBlock--;
-                            var buf = Buffer.alloc(16384);
-                            var len = fs.readSync(this.filedownload.f, buf, 4, 16380, null);
+                            var buf = Buffer.alloc(16384), want = 16380, len = 0;
+                            if ((this.filedownload.remaining != null) && (this.filedownload.remaining < want)) { want = this.filedownload.remaining; }
+                            try { len = fs.readSync(this.filedownload.f, buf, 4, want, this.filedownload.partial ? this.filedownload.ptr : null); } catch (ex) { len = 0; } // Partial downloads always read at an explicit position
                             this.filedownload.ptr += len;
-                            if (len < 16380) { buf.writeInt32BE(0x01000001, 0); fs.closeSync(this.filedownload.f); delete this.filedownload; sendNextBlock = 0; } else { buf.writeInt32BE(0x01000000, 0); }
+                            if (this.filedownload.remaining != null) { this.filedownload.remaining -= len; }
+                            if ((len < want) || (this.filedownload.remaining === 0)) { buf.writeInt32BE(0x01000001, 0); fs.closeSync(this.filedownload.f); delete this.filedownload; sendNextBlock = 0; } else { buf.writeInt32BE(0x01000000, 0); }
                             this.write(buf.slice(0, len + 4)); // Write as binary
                         }
                         break;

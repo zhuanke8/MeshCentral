@@ -163,6 +163,7 @@
             if (!inner) return;
             inner.scrollLeft += dir * 80;
         }
+
     </script>
     <!-- right click menu -->
     <div id="contextMenu" class="contextMenu noselect" style="display:none">
@@ -293,6 +294,11 @@
                                     <span>My Server</span>
                                 </div>
 
+                                <div id="mobileWebDAVMenuItem" class="userDropdownMenuItem userDropdownMobileOnly mobile-menu-item" data-action="webdav" onclick="handleUserMenuItem('webdav')">
+                                    <i class="fa fa-cloud userDropdownMenuIcon"></i>
+                                    <span>WebDAV</span>
+                                </div>
+
                                 <div id="userDropdownMenuDivider" class="userDropdownMobileOnly mobile-menu-item"></div>
 
                                 <div class="userDropdownMenuItem userDropdownUISettings" onclick="toggleUISubmenu(); event.stopPropagation();">
@@ -367,6 +373,7 @@
                 <a class="nav-link text-center text-white" id="LeftMenuMyFiles" href="#" data-target="files" onclick=go(5,event) onkeypress="if (event.key=='Enter') { go(5); }"><i class="fa-solid fa-folder-open me-2"></i></a>
                 <a class="nav-link text-center text-white" id="LeftMenuMyUsers" href="#" data-target="users" onclick=go(4,event) onkeypress="if (event.key=='Enter') { go(4); }"><i class="fa-solid fa-users me-2"></i></a>
                 <a class="nav-link text-center text-white" id="LeftMenuMyServer" href="#" data-target="server" onclick=go(6,event) onkeypress="if (event.key=='Enter') { go(6); }"><i class="fa-solid fa-server me-2"></i></a>
+                <a class="nav-link text-center text-white" id="LeftMenuMyWebDAV" href="#" data-target="webdav" onclick=go(7,event) onkeypress="if (event.key=='Enter') { go(7); }"><i class="fa-solid fa-cloud me-2"></i></a>
             </nav>
         </div>
         <div id=topbar class=noselect>
@@ -387,6 +394,8 @@
                                 onkeypress="if (event.key == 'Enter') go(4)">My Users</td>
                             <td tabindex=0 id=MainMenuMyServer class="topbar_td style3x" onmouseup=go(6,event)
                                 onkeypress="if (event.key == 'Enter') go(6)">My Server</td>
+                            <td tabindex=0 id=MainMenuMyWebDAV class="topbar_td style3x" onmouseup=go(7,event)
+                                onkeypress="if (event.key == 'Enter') go(7)">WebDAV</td>
                             <td class="topbar_td_end style3">&nbsp;</td>
                         </tr>
                     </table>
@@ -1013,6 +1022,33 @@
                     <div id=p10html3></div>
                     <div id=p10html4></div>
                     <div id=p10html5></div>
+                </div>
+            </div>
+            <div id=p7 style="display:none">
+                <div id="p7info" style="overflow-y:auto">
+                    <div id="p7title" class="d-flex align-items-center">
+                        <div class="fs-4 fw-bold"><i class="fa-solid fa-cloud fa-sm me-2 text-secondary"></i>WebDAV</div>
+                    </div>
+                    <div class="pe-2" style="max-width:1200px">
+                        <div class="card mb-3">
+                            <div class="card-body py-2">
+                                <div class="d-flex align-items-center flex-wrap mb-1">
+                                    <strong class="me-2">WebDAV address</strong>
+                                    <code id="p7webdavUrl" class="me-2" style="word-break:break-all"></code>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="webdavCopyUrl()" title="Copy"><i class="fa-solid fa-copy"></i></button>
+                                </div>
+                                <div class="small text-muted">Each device you can manage files on shows up as a folder. Devices only need the normal MeshAgent connection: no port is opened on the device.</div>
+                                <div class="small text-muted">alist: add a "WebDAV" storage with this address and one of the accounts below. Windows: map a network drive to this address (HTTPS required).</div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <button type="button" class="btn btn-primary btn-sm me-1" onclick="webdavShowDialog(null)"><i class="fa-solid fa-circle-plus"></i> New Account</button>
+                            <button type="button" class="btn btn-secondary btn-sm me-2" onclick="webdavRefresh()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                            <input type="text" id="p7filter" class="form-control form-control-sm" style="max-width:220px" placeholder="Filter" onkeyup="webdavRender()" />
+                        </div>
+                        <div id="p7msg" class="alert py-1 px-2 small" style="display:none"></div>
+                        <div id="p7accounts"></div>
+                    </div>
                 </div>
             </div>
             <div id=p9 style="display:none">
@@ -2884,6 +2920,8 @@
             QS('p43iframe')['max-height'] = 'calc(100vh - ' + (84 + xh) + 'px)';
             QS('p6info')['height'] = 'calc(100vh - ' + (-50 + xh + xh2) + 'px)';
             QS('p6info')['max-height'] = 'calc(100vh - ' + (-50 + xh + xh2) + 'px)';
+            QS('p7info')['height'] = 'calc(100vh - ' + (-50 + xh + xh2) + 'px)';
+            QS('p7info')['max-height'] = 'calc(100vh - ' + (-50 + xh + xh2) + 'px)';
             QS('p10info')['height'] = 'calc(100vh - ' + (20 + xh + xh2) + 'px)';
             QS('p10info')['max-height'] = 'calc(100vh - ' + (20 + xh + xh2) + 'px)';
             QS('p17info')['height'] = 'calc(100vh - ' + (20 + xh + xh2) + 'px)';
@@ -3493,6 +3531,10 @@
                             QH('p41traceStatus', "None");
                         }
                     }
+                    break;
+                }
+                case 'webdav': {
+                    webdavOnMessage(message);
                     break;
                 }
                 case 'serverstats': {
@@ -4329,6 +4371,10 @@
                     if (message.event.noact) break; // Take no action on this event
 
                     switch (message.event.action) {
+                        case 'webdav': {
+                            if (xxcurrentView == 7) { meshserver.send({ action: 'webdav', sub: 'list' }); }
+                            break;
+                        }
                         case 'serverinfochange': {
                             if (message.event.lock2factor != null) { serverinfo.lock2factor = message.event.lock2factor; updateSelf(); updateSiteAdmin(); }
                             break;
@@ -19579,7 +19625,10 @@
             161: "Disabled Duo two-factor authentication",
             162: "Started messenger session \"{0}\" from {1} to {2}",
             163: "Removed device {0} from user group {1}",
-            164: "Create file: \"{0}\""
+            164: "Create file: \"{0}\"",
+            901: "Created WebDAV account {0}",
+            902: "Changed WebDAV account {0}",
+            903: "Deleted WebDAV account {0}"
         };
 
         var eventsShortMessageId = {
@@ -21770,6 +21819,7 @@
                 case 'users': goForward('users'); break;
                 case 'files': goForward('files'); break;
                 case 'server': goForward('server'); break;
+                case 'webdav': goForward('webdav'); break;
                 case 'toggle-modern-ui': toggleBootstrapUIMode(); break;
                 case 'left-bar': userInterfaceSelectMenu(1); break;
                 case 'top-bar': userInterfaceSelectMenu(2); break;
@@ -23295,6 +23345,7 @@
                 go(5);
             }
             if (idtype == 'server') { go(6); }
+            if (idtype == 'webdav') { go(7); }
         }
 
         function getTabGroup(v) {
@@ -23375,14 +23426,14 @@
             }
 
             // Remove top bar selection
-            var mainBarItems = ['MainMenuMyDevices', 'MainMenuMyAccount', 'MainMenuMyEvents', 'MainMenuMyFiles', 'MainMenuMyUsers', 'MainMenuMyServer'];
+            var mainBarItems = ['MainMenuMyDevices', 'MainMenuMyAccount', 'MainMenuMyEvents', 'MainMenuMyFiles', 'MainMenuMyUsers', 'MainMenuMyServer', 'MainMenuMyWebDAV'];
             for (var i in mainBarItems) {
                 QC(mainBarItems[i]).remove('fullselect');
                 QC(mainBarItems[i]).remove('semiselect');
             }
 
             // Remove left bar selection
-            var leftBarItems = ['LeftMenuMyDevices', 'LeftMenuMyAccount', 'LeftMenuMyEvents', 'LeftMenuMyFiles', 'LeftMenuMyUsers', 'LeftMenuMyServer'];
+            var leftBarItems = ['LeftMenuMyDevices', 'LeftMenuMyAccount', 'LeftMenuMyEvents', 'LeftMenuMyFiles', 'LeftMenuMyUsers', 'LeftMenuMyServer', 'LeftMenuMyWebDAV'];
             for (var i in leftBarItems) {
                 QC(leftBarItems[i]).remove('lbbuttonsel');
                 QC(leftBarItems[i]).remove('lbbuttonsel2');
@@ -23419,6 +23470,11 @@
                 // My Server
                 QC('MainMenuMyServer').add(mainMenuActiveClass);
                 QC('LeftMenuMyServer').add(leftMenuActiveClass);
+            } else if (x == 7) {
+                // WebDAV
+                QC('MainMenuMyWebDAV').add(mainMenuActiveClass);
+                QC('LeftMenuMyWebDAV').add(leftMenuActiveClass);
+                webdavRefresh();
             }
             QV('ServerPlugins', pluginHandler != null);
 
@@ -24729,7 +24785,8 @@
             { key: 'myEvents', label: 'My Events', elementId: 'LeftMenuMyEvents' },
             { key: 'myFiles', label: 'My Files', elementId: 'LeftMenuMyFiles' },
             { key: 'myUsers', label: 'My Users', elementId: 'LeftMenuMyUsers' },
-            { key: 'myServer', label: 'My Server', elementId: 'LeftMenuMyServer' }
+            { key: 'myServer', label: 'My Server', elementId: 'LeftMenuMyServer' },
+            { key: 'myWebDAV', label: 'WebDAV', elementId: 'LeftMenuMyWebDAV' }
         ];
 
         function getVisibleCustomIconConfig() {
@@ -24920,7 +24977,8 @@
                 'myEvents': 'fa-calendar-alt',
                 'myFiles': 'fa-folder',
                 'myUsers': 'fa-users',
-                'myServer': 'fa-server'
+                'myServer': 'fa-server',
+                'myWebDAV': 'fa-cloud'
             };
             return iconMap[iconKey] || 'fa-icons';
         }
@@ -25058,6 +25116,247 @@
         window.addEventListener('beforeunload', function (e) {
             if (((desktop != null) && (xxcurrentView == 11)) || ((terminal != null) && (xxcurrentView == 12))) { e.preventDefault(); e.returnValue = ''; }
         });
+
+
+        //
+        // WebDAV (panel 7). Accounts are managed through the server websocket, see webdav/webdav.js
+        //
+        var webdavAccounts = null, webdavDevices = null, webdavIsAdmin = false, webdavPath = null, webdavDialogAccount = null, webdavDialogPending = false, webdavMsgTimer = null;
+
+        function webdavUrl() { return window.location.origin + ((webdavPath != null) ? webdavPath : '{{{domainurl}}}webdav/'); }
+        function webdavCopyUrl() { webdavCopy(webdavUrl()); }
+        function webdavCopy(text) {
+            if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(function () { webdavShowMsg("Copied to clipboard", false); }, function () { copyTextToClip(text); webdavShowMsg("Copied to clipboard", false); }); }
+            else { copyTextToClip(text); webdavShowMsg("Copied to clipboard", false); }
+        }
+
+        function webdavRefresh() {
+            Q('p7webdavUrl').textContent = webdavUrl();
+            if (meshserver == null) return;
+            meshserver.send({ action: 'webdav', sub: 'list' });
+            meshserver.send({ action: 'webdav', sub: 'devices' });
+        }
+
+        function webdavShowMsg(msg, isError) {
+            var e = Q('p7msg');
+            if (webdavMsgTimer != null) { clearTimeout(webdavMsgTimer); webdavMsgTimer = null; }
+            if (!msg) { QV('p7msg', false); return; }
+            e.className = 'alert py-1 px-2 small ' + (isError ? 'alert-danger' : 'alert-success');
+            e.textContent = msg;
+            QV('p7msg', true);
+            webdavMsgTimer = setTimeout(function () { QV('p7msg', false); }, isError ? 15000 : 4000);
+        }
+
+        function webdavOnMessage(message) {
+            if (message.error != null) {
+                var err = webdavErrorText(message);
+                if (webdavDialogPending && ((message.sub == 'create') || (message.sub == 'update')) && (Q('d7wdError') != null)) {
+                    webdavDialogPending = false;
+                    QH('d7wdError', EscapeHtml(err));
+                    QE('idx_dlgOkButton', true);
+                } else {
+                    webdavShowMsg(err, true);
+                }
+                if ((message.sub == 'list') && (webdavAccounts == null)) { webdavAccounts = []; webdavRender(); }
+                return;
+            }
+            switch (message.sub) {
+                case 'list': {
+                    webdavAccounts = message.accounts || [];
+                    webdavIsAdmin = (message.isAdmin === true);
+                    if (typeof message.path == 'string') { webdavPath = message.path; }
+                    Q('p7webdavUrl').textContent = webdavUrl();
+                    webdavRender();
+                    break;
+                }
+                case 'devices': {
+                    webdavDevices = message.devices || [];
+                    webdavRender();
+                    if ((Q('d7wdDevices') != null) && (Q('d7wdDevices').options.length == 0)) { webdavFillDeviceSelect(); }
+                    break;
+                }
+                case 'create':
+                case 'update':
+                case 'delete': {
+                    if (webdavDialogPending && (message.sub != 'delete')) {
+                        webdavDialogPending = false;
+                        if ((Q('d7wdError') != null) && (xxModal != null)) { if (xxModalShown) { xxModal.hide(); } else { xxModalHidePending = true; } }
+                    }
+                    webdavShowMsg(format((message.sub == 'create') ? "Account {0} created." : ((message.sub == 'update') ? "Account {0} updated." : "Account {0} deleted."), message.username), false);
+                    meshserver.send({ action: 'webdav', sub: 'list' });
+                    break;
+                }
+            }
+        }
+
+        // Server errors come with an id so that they can be translated here
+        var webdavErrors = {
+            1: "WebDAV is disabled on this server.",
+            2: "Username must be 3 to 64 characters: letters, digits, dot, underscore, @ or dash.",
+            3: "Password must be at least 8 characters.",
+            4: "This WebDAV username is already used.",
+            5: "Too many WebDAV accounts.",
+            6: "Select at least one device.",
+            7: "Too many devices.",
+            8: "No file access rights on a selected device.",
+            9: "Invalid root folder.",
+            10: "Account not found.",
+            11: "Access denied.",
+            12: "The owner of this account no longer exists."
+        };
+        function webdavErrorText(message) {
+            if (message.error == 'disabled') return webdavErrors[1];
+            if ((message.errorId != null) && (webdavErrors[message.errorId] != null)) return webdavErrors[message.errorId];
+            return message.error;
+        }
+
+        function webdavDeviceInfo(id) {
+            if (webdavDevices != null) { for (var i in webdavDevices) { if (webdavDevices[i].id == id) return webdavDevices[i]; } }
+            return null;
+        }
+
+        function webdavRender() {
+            if (webdavAccounts == null) { QH('p7accounts', '<div class="text-muted p-3">' + "Loading..." + '</div>'); return; }
+            if (webdavAccounts.length == 0) {
+                QH('p7accounts', '<div class="text-center text-muted p-4"><i class="fa-solid fa-cloud fa-3x mb-2"></i><div>' + "No WebDAV accounts yet." + '</div><button type="button" class="btn btn-primary btn-sm mt-2" onclick="webdavShowDialog(null)">' + "Create an account" + '</button></div>');
+                return;
+            }
+            var filter = Q('p7filter').value.trim().toLowerCase(), count = 0;
+            var x = '<div class="table-responsive"><table class="table table-sm table-hover align-middle"><thead><tr><th>' + "Username" + '</th>' + (webdavIsAdmin ? ('<th>' + "Owner" + '</th>') : '') + '<th>' + "Devices" + '</th><th>' + "Access" + '</th><th>' + "Root folder" + '</th><th>' + "Status" + '</th><th>' + "Last used" + '</th><th></th></tr></thead><tbody>';
+            for (var i = 0; i < webdavAccounts.length; i++) {
+                var a = webdavAccounts[i], devices = '';
+                if (a.allDevices) {
+                    devices = '<i>' + "All devices with file access" + '</i>';
+                } else {
+                    var names = [];
+                    for (var j in a.devices) {
+                        var d = a.devices[j], info = webdavDeviceInfo(d.id);
+                        if (d.name == null) { names.push('<span class="text-danger">' + "Removed device" + '</span>'); continue; }
+                        names.push('<span title="' + EscapeHtml((info != null) ? info.mesh : '') + '">' + (((info != null) && info.online) ? '<i class="fa-solid fa-circle text-success me-1" style="font-size:7px;vertical-align:middle"></i>' : '<i class="fa-solid fa-circle text-secondary me-1" style="font-size:7px;vertical-align:middle"></i>') + EscapeHtml(d.name) + '</span>');
+                    }
+                    devices = names.join(', ');
+                }
+                var searchText = (a.username + ' ' + (a.ownerName || '') + ' ' + (a.allDevices ? '' : a.devices.map(function (d) { return d.name || ''; }).join(' '))).toLowerCase();
+                if ((filter != '') && (searchText.indexOf(filter) < 0)) continue;
+                count++;
+                x += '<tr><td><i class="fa-solid fa-user-lock me-1 text-secondary"></i><strong>' + EscapeHtml(a.username) + '</strong></td>';
+                if (webdavIsAdmin) { x += '<td>' + EscapeHtml(a.ownerName || "Unknown") + '</td>'; }
+                x += '<td style="max-width:380px">' + devices + '</td>';
+                x += '<td>' + (a.readOnly ? ('<span class="badge bg-warning text-dark">' + "Read only" + '</span>') : ('<span class="badge bg-primary">' + "Read and write" + '</span>')) + '</td>';
+                x += '<td>' + (a.rootPath ? ('<code>' + EscapeHtml(a.rootPath) + '</code>') : '<span class="text-muted">' + "Whole file system" + '</span>') + '</td>';
+                x += '<td>' + (a.enabled ? ('<span class="badge bg-success">' + "Enabled" + '</span>') : ('<span class="badge bg-secondary">' + "Disabled" + '</span>')) + '</td>';
+                x += '<td class="small">' + (a.lastUsed ? printDateTime(new Date(a.lastUsed)) : '<span class="text-muted">-</span>') + '</td>';
+                x += '<td class="text-end text-nowrap">';
+                x += '<button type="button" class="btn btn-outline-secondary btn-sm me-1" title="' + "Edit" + '" onclick="webdavShowDialog(' + i + ')"><i class="fa-solid fa-pen"></i></button>';
+                x += '<button type="button" class="btn btn-outline-secondary btn-sm me-1" title="' + (a.enabled ? "Disable" : "Enable") + '" onclick="webdavToggle(' + i + ')"><i class="fa-solid ' + (a.enabled ? 'fa-pause' : 'fa-play') + '"></i></button>';
+                x += '<button type="button" class="btn btn-outline-danger btn-sm" title="' + "Delete" + '" onclick="webdavDelete(' + i + ')"><i class="fa-solid fa-trash"></i></button>';
+                x += '</td></tr>';
+            }
+            x += '</tbody></table></div>';
+            if (count == 0) { x = '<div class="text-muted p-3">' + "No matching accounts." + '</div>'; }
+            QH('p7accounts', x);
+        }
+
+        function webdavToggle(i) {
+            var a = webdavAccounts[i];
+            if (a == null) return;
+            meshserver.send({ action: 'webdav', sub: 'update', username: a.username, enabled: !a.enabled });
+        }
+
+        function webdavDelete(i) {
+            var a = webdavAccounts[i];
+            if ((a == null) || xxdialogMode) return;
+            setModalContent('xxAddAgent', "Delete WebDAV Account", format("Delete WebDAV account {0}? Clients using it will lose access.", a.username));
+            showModal('xxAddAgentModal', 'idx_dlgOkButton', function () { meshserver.send({ action: 'webdav', sub: 'delete', username: a.username }); });
+        }
+
+        function webdavGeneratePassword() {
+            var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789', v = new Uint32Array(20), p = '';
+            window.crypto.getRandomValues(v);
+            for (var i = 0; i < v.length; i++) { p += chars[v[i] % chars.length]; }
+            Q('d7wdPass').type = 'text';
+            Q('d7wdPass').value = p;
+        }
+
+        function webdavFillDeviceSelect() {
+            var sel = Q('d7wdDevices'), a = webdavDialogAccount, selected = {}, groups = {}, groupNames = [];
+            if (sel == null) return;
+            if ((a != null) && !a.allDevices) { for (var i in a.devices) { selected[a.devices[i].id] = a.devices[i]; } }
+            for (var i in webdavDevices) {
+                var d = webdavDevices[i];
+                if (groups[d.mesh] == null) { groups[d.mesh] = []; groupNames.push(d.mesh); }
+                groups[d.mesh].push(d);
+            }
+            groupNames.sort();
+            var x = '';
+            for (var g in groupNames) {
+                x += '<optgroup label="' + EscapeHtml(groupNames[g]) + '">';
+                for (var i in groups[groupNames[g]]) {
+                    var d = groups[groupNames[g]][i];
+                    x += '<option value="' + EscapeHtml(d.id) + '"' + ((selected[d.id] != null) ? ' selected' : '') + '>' + EscapeHtml(d.name) + (d.online ? '' : (' (' + "offline" + ')')) + '</option>';
+                    delete selected[d.id];
+                }
+                x += '</optgroup>';
+            }
+            for (var id in selected) { x += '<option value="' + EscapeHtml(id) + '" selected>' + EscapeHtml(selected[id].name || id) + ' (' + "no file access" + ')</option>'; }
+            sel.innerHTML = x;
+            $('#d7wdDevices').trigger('change');
+        }
+
+        function webdavDialogUpdate() { $('#d7wdDevices').prop('disabled', Q('d7wdAll').checked); }
+
+        function webdavShowDialog(i) {
+            if (xxdialogMode) return;
+            var a = (i != null) ? webdavAccounts[i] : null;
+            if ((i != null) && (a == null)) return;
+            webdavDialogAccount = a;
+            webdavDialogPending = false;
+            var x = '<div id="d7webdav">';
+            x += '<div class="mb-2"><label class="form-label mb-0" for="d7wdUser">' + "Username" + '</label><input type="text" id="d7wdUser" class="form-control form-control-sm" maxlength="64" autocomplete="off" placeholder="' + "3 to 64 letters, digits, . _ @ -" + '" /></div>';
+            x += '<div class="mb-2"><label class="form-label mb-0" for="d7wdPass">' + ((a != null) ? "New password, leave empty to keep the current one" : "Password, at least 8 characters") + '</label>';
+            x += '<div class="input-group input-group-sm"><input type="password" id="d7wdPass" class="form-control" maxlength="256" autocomplete="new-password" />';
+            x += '<button class="btn btn-outline-secondary" type="button" onclick="webdavGeneratePassword()">' + "Generate" + '</button>';
+            x += '<button class="btn btn-outline-secondary" type="button" title="' + "Copy" + '" onclick="webdavCopy(Q(\'d7wdPass\').value)"><i class="fa-solid fa-copy"></i></button></div></div>';
+            x += '<div class="mb-2"><label class="form-label mb-0" for="d7wdAccess">' + "Access" + '</label><select id="d7wdAccess" class="form-select form-select-sm"><option value="rw">' + "Read and write" + '</option><option value="ro">' + "Read only" + '</option></select></div>';
+            x += '<div class="mb-2"><label class="form-label mb-0" for="d7wdDevices">' + "Devices" + '</label>';
+            x += '<select id="d7wdDevices" multiple="multiple" style="width:100%"></select>';
+            x += '<div class="form-check mt-1"><input class="form-check-input" type="checkbox" id="d7wdAll" onchange="webdavDialogUpdate()" /><label class="form-check-label small" for="d7wdAll">' + "All devices I can manage files on, including devices added later" + '</label></div></div>';
+            x += '<div class="mb-2"><label class="form-label mb-0" for="d7wdRoot">' + "Root folder (optional)" + '</label><input type="text" id="d7wdRoot" class="form-control form-control-sm" maxlength="1024" placeholder="/srv/share  D:/Share" />';
+            x += '<div class="form-text">' + "Only this folder of each device is shared. Leave empty to share the whole file system." + '</div></div>';
+            x += '<div id="d7wdError" class="text-danger small"></div></div>';
+            setModalContent('xxAddAgent', (a != null) ? "Edit WebDAV Account" : "New WebDAV Account", x, 'large');
+            Q('d7wdUser').value = (a != null) ? a.username : '';
+            Q('d7wdUser').disabled = (a != null);
+            Q('d7wdAccess').value = ((a != null) && a.readOnly) ? 'ro' : 'rw';
+            Q('d7wdAll').checked = ((a != null) && a.allDevices);
+            Q('d7wdRoot').value = ((a != null) && a.rootPath) ? a.rootPath : '';
+            $('#d7wdDevices').select2({ theme: 'bootstrap-5', width: '100%', placeholder: "Select devices", closeOnSelect: false, dropdownParent: $('#xxAddAgentModal') });
+            if (webdavDevices != null) { webdavFillDeviceSelect(); } else { meshserver.send({ action: 'webdav', sub: 'devices' }); }
+            webdavDialogUpdate();
+            showModal('xxAddAgentModal', 'idx_dlgOkButton', webdavDialogOk);
+            if (a == null) { focusTextBox('d7wdUser'); }
+        }
+
+        function webdavDialogOk() {
+            var a = webdavDialogAccount, err = null;
+            var cmd = { action: 'webdav', sub: (a != null) ? 'update' : 'create', username: (a != null) ? a.username : Q('d7wdUser').value.trim() };
+            var pass = Q('d7wdPass').value;
+            cmd.readOnly = (Q('d7wdAccess').value == 'ro');
+            cmd.allDevices = Q('d7wdAll').checked;
+            cmd.deviceIds = cmd.allDevices ? [] : ($('#d7wdDevices').val() || []);
+            cmd.rootPath = Q('d7wdRoot').value.trim();
+            if ((a == null) && !/^[A-Za-z0-9][A-Za-z0-9._@-]{2,63}$/.test(cmd.username)) { err = "Username must be 3 to 64 characters: letters, digits, dot, underscore, @ or dash."; }
+            else if (((a == null) || (pass.length > 0)) && (pass.length < 8)) { err = "Password must be at least 8 characters."; }
+            else if (!cmd.allDevices && (cmd.deviceIds.length == 0)) { err = "Select at least one device."; }
+            if (err != null) { QH('d7wdError', EscapeHtml(err)); return false; }
+            if (pass.length > 0) { cmd.password = pass; }
+            QH('d7wdError', '');
+            QE('idx_dlgOkButton', false);
+            webdavDialogPending = true;
+            meshserver.send(cmd);
+            return false; // Keep the dialog open until the server answers
+        }
+
     </script>
 </body>
 
